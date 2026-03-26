@@ -78,3 +78,18 @@ export const deleteState = async (req, res) => {
     }
 };
 
+// GET STATES BY COUNTRY ID
+export const getStatesByCountryId = async (req, res) => {
+    try {
+        const { countryId } = req.params;
+        const result = await pool.query(
+            "SELECT * FROM state WHERE country_id = $1 ORDER BY id ASC",
+            [countryId]
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error fetching states by country id:", error);
+        res.status(500).json({ message: "Error fetching states" });
+    }
+};
+

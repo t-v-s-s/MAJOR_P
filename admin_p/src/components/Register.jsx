@@ -9,10 +9,16 @@ function Register() {
         email: "",
         phone: "",
         password: "",
-        country_id: ""
+        country_id: "",
+        state_id: "",
+        city_id: "",
+        area_id: ""
     });
 
     const [countries, setCountries] = useState([]);
+    const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [areas, setAreas] = useState([]);
 
     // Fetch countries
     useEffect(() => {
@@ -24,6 +30,48 @@ function Register() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleCountryChange = (e) => {
+        const selectedCountry = e.target.value;
+        setFormData({ ...formData, country_id: selectedCountry, state_id: "", city_id: "", area_id: "" });
+        setCities([]);
+        setAreas([]);
+        if (selectedCountry) {
+            fetch(`http://localhost:3000/api/master/state/country/${selectedCountry}`)
+                .then(res => res.json())
+                .then(data => setStates(data))
+                .catch(err => console.error(err));
+        } else {
+            setStates([]);
+        }
+    };
+
+    const handleStateChange = (e) => {
+        const selectedState = e.target.value;
+        setFormData({ ...formData, state_id: selectedState, city_id: "", area_id: "" });
+        setAreas([]);
+        if (selectedState) {
+            fetch(`http://localhost:3000/api/master/city/state/${selectedState}`)
+                .then(res => res.json())
+                .then(data => setCities(data))
+                .catch(err => console.error(err));
+        } else {
+            setCities([]);
+        }
+    };
+
+    const handleCityChange = (e) => {
+        const selectedCity = e.target.value;
+        setFormData({ ...formData, city_id: selectedCity, area_id: "" });
+        if (selectedCity) {
+            fetch(`http://localhost:3000/api/master/area/city/${selectedCity}`)
+                .then(res => res.json())
+                .then(data => setAreas(data))
+                .catch(err => console.error(err));
+        } else {
+            setAreas([]);
+        }
     };
 
     const handleRegister = async () => {
@@ -57,16 +105,34 @@ function Register() {
                 <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
 
                 {/* Country Dropdown */}
-                <select
-                    name="country_id"
-                    onChange={handleChange}
-                    required
-                >
+                <select name="country_id" onChange={handleCountryChange} value={formData.country_id} required>
                     <option value="">Select Country</option>
                     {countries.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.name}
-                        </option>
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                </select>
+
+                {/* State Dropdown */}
+                <select name="state_id" onChange={handleStateChange} value={formData.state_id} required>
+                    <option value="">Select State</option>
+                    {states.map((s) => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                </select>
+
+                {/* City Dropdown */}
+                <select name="city_id" onChange={handleCityChange} value={formData.city_id} required>
+                    <option value="">Select City</option>
+                    {cities.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                </select>
+
+                {/* Area Dropdown */}
+                <select name="area_id" onChange={handleChange} value={formData.area_id} required>
+                    <option value="">Select Area</option>
+                    {areas.map((a) => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
                     ))}
                 </select>
 

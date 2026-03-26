@@ -130,3 +130,20 @@ export const deleteCity = async (req, res) => {
         res.status(500).json({ message: "Server error while deleting city" });
     }
 };
+
+// ======================================
+// GET CITIES BY STATE ID
+// ======================================
+export const getCitiesByStateId = async (req, res) => {
+    try {
+        const { stateId } = req.params;
+        const result = await pool.query(
+            "SELECT * FROM city WHERE state_id = $1 ORDER BY id ASC",
+            [stateId]
+        );
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error("Error fetching cities by state id:", error);
+        res.status(500).json({ message: "Server error while fetching cities" });
+    }
+};

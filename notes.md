@@ -45,3 +45,25 @@ DROP TABLE IF EXISTS property CASCADE;
 
 
 
+INSERT INTO country (name) VALUES ('India'), ('China'), ('Japan'), ('France'), ('South Africa');
+
+INSERT INTO state (name, country_id) VALUES 
+('Maharashtra', (SELECT id FROM country WHERE name='India')),
+('Uttar Pradesh', (SELECT id FROM country WHERE name='India')),
+('Karnataka', (SELECT id FROM country WHERE name='India')),
+('Tamil Nadu', (SELECT id FROM country WHERE name='India')),
+('Gujarat', (SELECT id FROM country WHERE name='India'));
+
+INSERT INTO city (name, state_id) VALUES 
+('Mumbai', (SELECT id FROM state WHERE name='Maharashtra')),
+('Pune', (SELECT id FROM state WHERE name='Maharashtra')),
+('Nagpur', (SELECT id FROM state WHERE name='Maharashtra')),
+('Nashik', (SELECT id FROM state WHERE name='Maharashtra')),
+('Aurangabad', (SELECT id FROM state WHERE name='Maharashtra'));
+
+INSERT INTO area (name, city_id) VALUES 
+('Andheri', (SELECT id FROM city WHERE name='Mumbai')),
+('Bandra', (SELECT id FROM city WHERE name='Mumbai')),
+('Borivali', (SELECT id FROM city WHERE name='Mumbai')),
+('Colaba', (SELECT id FROM city WHERE name='Mumbai')),
+('Dadar', (SELECT id FROM city WHERE name='Mumbai'));

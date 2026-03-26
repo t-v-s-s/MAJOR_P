@@ -12,6 +12,7 @@ import {
 import {
     getCities,
     getCityById,
+    getCitiesByStateId,
     addCity,
     updateCity,
     deleteCity
@@ -20,6 +21,7 @@ import {
 import {
     getAreas,
     getAreaById,
+    getAreasByCityId,
     addArea,
     updateArea,
     deleteArea
@@ -36,6 +38,7 @@ import {
 import {
     getStates,
     getStateById,
+    getStatesByCountryId,
     addState,
     updateState,
     deleteState,
@@ -53,6 +56,7 @@ router.delete("/property-type/:id", deletePropertyType);
 // City
 router.get("/city", getCities);
 router.get("/city/:id", getCityById);
+router.get("/city/state/:stateId", getCitiesByStateId);
 router.post("/city", addCity);
 router.put("/city/:id", updateCity);
 router.delete("/city/:id", deleteCity);
@@ -60,6 +64,7 @@ router.delete("/city/:id", deleteCity);
 // Area
 router.get("/area", getAreas);
 router.get("/area/:id", getAreaById);
+router.get("/area/city/:cityId", getAreasByCityId);
 router.post("/area", addArea);
 router.put("/area/:id", updateArea);
 router.delete("/area/:id", deleteArea);
@@ -74,9 +79,9 @@ router.delete("/country/:id", deleteCountry);
 // State
 router.get("/state", getStates);
 router.get("/state/:id", getStateById);
+router.get("/state/country/:countryId", getStatesByCountryId);
 router.post("/state", addState);
 router.put("/state/:id", updateState);
 router.delete("/state/:id", deleteState);
-
 
 export default router;
