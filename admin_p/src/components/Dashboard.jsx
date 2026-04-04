@@ -206,7 +206,7 @@ export default function Dashboard() {
                         onMouseEnter={() => setHovered("user")}
                         onMouseLeave={() => setHovered("")}
                         style={{
-                            ...getMenuItemStyle("user"),
+                            ...getSubMenuItemStyle("user"),
                             justifyContent: "space-between"
                         }}
                     >
