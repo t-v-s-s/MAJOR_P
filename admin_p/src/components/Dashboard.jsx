@@ -3,6 +3,7 @@ import Area from "../pages/Masters/area";
 import PropertyType from "../pages/Masters/property_type";
 import Country from "../pages/Masters/country";
 import State from "../pages/Masters/state";
+import User_info from "../pages/Users/user_info";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -23,6 +24,7 @@ export default function Dashboard() {
     const [username, setUsername] = useState("");
     const [active, setActive] = useState("home");
     const [masterOpen, setMasterOpen] = useState(false);
+    const [userOpen, setUserOpen] = useState(false);
     const [hovered, setHovered] = useState("");
 
     useEffect(() => {
@@ -198,6 +200,20 @@ export default function Dashboard() {
                             </div>
                         </div>
                     )}
+
+                    <div
+                        onClick={() => setActive("user")} // setUserOpen(!userOpen)}
+                        onMouseEnter={() => setHovered("user")}
+                        onMouseLeave={() => setHovered("")}
+                        style={{
+                            ...getMenuItemStyle("user"),
+                            justifyContent: "space-between"
+                        }}
+                    >
+                        <span style={{ fontWeight: "500" }}>User</span>
+                        {userOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    </div>
+
                 </div>
 
                 <button
@@ -279,6 +295,7 @@ export default function Dashboard() {
                 {active === "area" && <Area />}
                 {active === "country" && <Country />}
                 {active === "state" && <State />}
+                {active === "user" && <User_info />}
             </div>
         </div>
     );

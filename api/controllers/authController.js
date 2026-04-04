@@ -19,7 +19,8 @@ export const registerUser = async (req, res) => {
 
     // Insert user into DB including all new fields
     await pool.query(
-      "INSERT INTO user_info (username, email, phone, password, country_id, state_id, city_id, area_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      "INSERT INTO user_info (username, email, phone, password, country_id, state_id, city_id, area_id) \
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
       [username, email, phone, hashedPassword, country_id, state_id, city_id, area_id]
     );
 

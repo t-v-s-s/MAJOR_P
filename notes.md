@@ -67,3 +67,16 @@ INSERT INTO area (name, city_id) VALUES
 ('Borivali', (SELECT id FROM city WHERE name='Mumbai')),
 ('Colaba', (SELECT id FROM city WHERE name='Mumbai')),
 ('Dadar', (SELECT id FROM city WHERE name='Mumbai'));
+
+
+
+# 1. Postgres command line 
+psql -U postgres -d api -p 5433
+api=# 
+
+ALTER TABLE user_info ADD COLUMN country_id INTEGER REFERENCES country(id) ON DELETE SET NULL;
+ALTER TABLE user_info ADD COLUMN state_id INTEGER REFERENCES state(id) ON DELETE SET NULL;
+ALTER TABLE user_info ADD COLUMN city_id INTEGER REFERENCES city(id) ON DELETE SET NULL;
+ALTER TABLE user_info ADD COLUMN area_id INTEGER REFERENCES area(id) ON DELETE SET NULL;
+
+
