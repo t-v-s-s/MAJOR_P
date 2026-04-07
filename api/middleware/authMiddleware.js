@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const verifyToken = (req, res, next) => {
-
+    console.log("verifyToken called")
     const token = req.headers.authorization;
 
     if (!token) {

@@ -4,6 +4,7 @@ import PropertyType from "../pages/Masters/property_type";
 import Country from "../pages/Masters/country";
 import State from "../pages/Masters/state";
 import User_info from "../pages/Users/user_info";
+import Products_info from "../pages/Products/products_info"
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,7 +15,10 @@ import {
     ChevronRight,
     Building2,
     MapPinned,
-    Map
+    Map,
+    Globe,
+    User,
+    Package
 } from "lucide-react";
 
 
@@ -185,7 +189,7 @@ export default function Dashboard() {
                                 onMouseLeave={() => setHovered("")}
                                 style={getSubMenuItemStyle("country")}
                             >
-                                <MapPinned size={18} />
+                                <Globe size={18} />
                                 <span>Country</span>
                             </div>
 
@@ -195,14 +199,14 @@ export default function Dashboard() {
                                 onMouseLeave={() => setHovered("")}
                                 style={getSubMenuItemStyle("state")}
                             >
-                                <MapPinned size={18} />
+                                <Map size={18} />
                                 <span>State</span>
                             </div>
                         </div>
                     )}
 
                     <div
-                        onClick={() => setActive("user")} // setUserOpen(!userOpen)}
+                        onClick={() => setActive("user")}
                         onMouseEnter={() => setHovered("user")}
                         onMouseLeave={() => setHovered("")}
                         style={{
@@ -210,8 +214,20 @@ export default function Dashboard() {
                             justifyContent: "space-between"
                         }}
                     >
-                        <span style={{ fontWeight: "500" }}>User</span>
-                        {userOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <User size={18} />
+                            <span>User</span>
+                        </div>
+                    </div>
+
+                    <div
+                        onClick={() => setActive("products")}
+                        onMouseEnter={() => setHovered("products")}
+                        onMouseLeave={() => setHovered("")}
+                        style={getSubMenuItemStyle("products")}
+                    >
+                        <Package size={20} />
+                        <span>Products</span>
                     </div>
 
                 </div>
@@ -296,6 +312,7 @@ export default function Dashboard() {
                 {active === "country" && <Country />}
                 {active === "state" && <State />}
                 {active === "user" && <User_info />}
+                {active === "products" && <Products_info />}
             </div>
         </div>
     );
