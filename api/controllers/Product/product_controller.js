@@ -15,11 +15,12 @@ const pool = new Pool({
 export const addProduct = async (req, res) => {
     console.log("addProduct called")
     try {
-        const { product_name, price } = req.body;
+        const { product_name, price, description } = req.body;
+        const image = req.file ? req.file.filename : null;
 
         const result = await pool.query(
-            "INSERT INTO products (product_name, price) VALUES ($1, $2) RETURNING *",
-            [product_name, price]
+            "INSERT INTO products (product_name, price, description, image) VALUES ($1, $2, $3, $4) RETURNING *",
+            [product_name || null, price !== undefined ? price : null, description || null, image || null]
         );
 
         res.json({
@@ -72,8 +73,8 @@ export const updateProduct = async (req, res) => {
         const image = req.file ? req.file.filename : null;
 
         const result = await pool.query(
-            "UPDATE products SET product_name=$1, price=$2, category=$3, image=$4 WHERE id=$5 RETURNING *",
-            [product_name, price, category, image, id]
+            "UPDATE products SET product_name=COALESCE($1, product_name), price=COALESCE($2, price), category=COALESCE($3, category), image=COALESCE($4, image) WHERE id=$5 RETURNING *",
+            [product_name || null, price !== undefined ? price : null, category || null, image || null, id]
         );
         res.json({
             message: "Product updated",

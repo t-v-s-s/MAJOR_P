@@ -8,13 +8,35 @@ export default function Product() {
     const [showPopup, setShowPopup] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [productName, setProductName] = useState("");
+
+    const [price, setPrice] = useState("");
+    const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("");
+    const [image, setImage] = useState(null);
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const limit = 5;
+
+    //  FILTER FIRST
+    const filteredProducts = productData.filter((p) =>
+        (p.product_name || "").toLowerCase().includes(search.toLowerCase())
+    );
+
+    // PAGINATION ON FILTERED DATA
+    const totalPages = Math.ceil(filteredProducts.length / limit);
+
+    const paginatedProducts = filteredProducts.slice(
+        (page - 1) * limit,
+        page * limit
+    );
+
     const [editId, setEditId] = useState(null);
 
     useEffect(() => {
         fetchProducts();
     }, []);
 
-    // ✅ FETCH PRODUCTS WITH TOKEN
+    // FETCH PRODUCTS WITH TOKEN
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -46,7 +68,7 @@ export default function Product() {
         setShowModal(true);
     };
 
-    // ✅ DELETE WITH TOKEN
+    // DELETE WITH TOKEN
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this product?")) return;
 
@@ -68,44 +90,61 @@ export default function Product() {
         }
     };
 
-    // ✅ FIXED SAVE FUNCTION
+    // SAVE product
     const saveProduct = async () => {
         try {
             const token = localStorage.getItem("token");
 
+            // VALIDATION
+            if (!productName || !price || !category) {
+                alert("Please fill all required fields");
+                return;
+            }
+
+            //  USE FORMDATA
+            const formData = new FormData();
+            formData.append("product_name", productName);
+            formData.append("price", price);
+            formData.append("description", description);
+            formData.append("category", category);
+            if (image) formData.append("image", image);
+
             const config = {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
                 }
             };
 
             if (editId) {
                 await axios.put(
                     `http://localhost:3000/api/products/${editId}`,
-                    {
-                        product_name: productName,
-                        price: 0
-                    },
+                    formData,
                     config
                 );
             } else {
                 await axios.post(
                     "http://localhost:3000/api/products",
-                    {
-                        product_name: productName,
-                        price: 0
-                    },
+                    formData,
                     config
                 );
             }
 
-            // ✅ RESET + REFRESH
+
+
+            // RESET + REFRESH
             setShowModal(false);
             setProductName("");
-            setEditId(null);
-            fetchProducts();
 
-            // ✅ POPUP
+            fetchProducts();
+            setPrice("");
+            setDescription("");
+            setCategory("");
+            setImage(null);
+            setEditId(null);
+
+
+            //  POPUP
             setShowPopup(true);
             setTimeout(() => setShowPopup(false), 2000);
 
@@ -172,6 +211,67 @@ export default function Product() {
                                 border: "1px solid #ccc"
                             }}
                         />
+                        {/* Price */}
+                        <input
+                            type="number"
+                            placeholder="Enter price"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginTop: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc"
+                            }}
+                        />
+
+                        {/* Description  */}
+                        <input
+                            type="text"
+                            placeholder="Description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginTop: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc"
+                            }}
+                        />
+
+                        {/* CATEGORY */}
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginTop: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc"
+                            }}
+                        >
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothes">Clothes</option>
+                            <option value="Cosmetics">Cosmetics</option>
+                            <option value="Decor">Decor</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Furniture">Furniture</option>
+                        </select>
+
+
+                        {/* IMAGE */}
+                        <input
+                            type="file"
+                            onChange={(e) => setImage(e.target.files[0])}
+                            style={{
+                                width: "100%",
+                                marginTop: "10px"
+                            }}
+                        />
 
                         <div style={{ marginTop: "15px" }}>
                             <button
@@ -205,6 +305,7 @@ export default function Product() {
                 </div>
             )}
 
+
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -216,7 +317,13 @@ export default function Product() {
                 }}
             >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+
+
                     <h2>Product List</h2>
+                    <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+                        <div className="card">Total Products: {productData.length}</div>
+                        <div className="card">Categories: 6</div>
+                    </div>
 
                     <button
                         onClick={handleAddProduct}
@@ -241,14 +348,28 @@ export default function Product() {
                         <tr style={{ background: "#fff3eb" }}>
                             <th style={{ padding: "12px" }}>ID</th>
                             <th style={{ padding: "12px" }}>Product Name</th>
+                            <th style={{ padding: "12px" }}>Price</th>
+                            <th style={{ padding: "12px" }}>Description</th>
+                            <th style={{ padding: "12px" }}>Image</th>
                             <th style={{ padding: "12px" }}>Action</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {productData.map((product) => (
+                        {paginatedProducts.map((product) => (
                             <tr key={product.id}>
                                 <td style={{ padding: "12px" }}>{product.id}</td>
                                 <td style={{ padding: "12px" }}>{product.product_name}</td>
+                                <td style={{ padding: "12px" }}>{product.price}</td>
+                                <td style={{ padding: "12px" }}>{product.description}</td>
+                                <td style={{ padding: "12px" }}>
+                                    {product.image && (
+                                        <img
+                                            src={`http://localhost:3000/uploads/${product.image}`}
+                                            width="50"
+                                        />
+                                    )}
+                                </td>
                                 <td style={{ padding: "12px" }}>
                                     <button onClick={() => handleEdit(product)}>
                                         <Pencil size={18} color="#f97316" />
@@ -260,7 +381,66 @@ export default function Product() {
                             </tr>
                         ))}
                     </tbody>
+
                 </table>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                    gap: "10px"
+                }}>
+                    <button
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 1}
+                        style={{
+                            padding: "8px 12px",
+                            background: page === 1 ? "#ccc" : "#f97316",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "6px",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Prev
+                    </button>
+
+                    <span style={{ padding: "8px 12px" }}>
+                        Page {page} of {totalPages}
+                    </span>
+
+                    <button
+                        onClick={() => setPage(page + 1)}
+                        disabled={page === totalPages}
+                        style={{
+                            padding: "8px 12px",
+                            background: page === totalPages ? "#ccc" : "#f97316",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "6px",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Next
+                    </button>
+                </div>
+                <div style={{ marginBottom: "15px" }}>
+                    <input
+                        type="text"
+                        placeholder="Search product..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPage(1); // VERY IMPORTANT
+                        }}
+                        style={{
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1px solid #ccc",
+                            width: "250px"
+                        }}
+                    />
+                </div>
+
             </motion.div>
         </>
     );
