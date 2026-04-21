@@ -93,7 +93,7 @@ export default function Profile() {
 
                     {/* Footer */}
                     <p className="text-center text-gray-400 text-xs mt-6 tracking-wide">
-                        CALM • CLEAN • PREMIUM
+
                     </p>
                 </div>
             </motion.div>
