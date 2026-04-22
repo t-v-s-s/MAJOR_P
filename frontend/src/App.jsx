@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Deals from "./pages/Deals";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Checkout />
           </ProtectedRoute>
         } />
+        <Route path="/product/:id" element={<ProductDetails />} />
 
         <Route path="/login" element={<AuthRedirect> <Login /> </AuthRedirect>} />
         <Route path="/register" element={<AuthRedirect> <Register /> </AuthRedirect>} />

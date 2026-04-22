@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { motion as Motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductCard({ product }) {
     const { addToCart } = useCart();
+    const navigate = useNavigate();
 
     const [added, setAdded] = useState(false);
     const [wishlist, setWishlist] = useState(() => {
@@ -50,11 +52,25 @@ export default function ProductCard({ product }) {
 
     return (
         <>
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition relative">
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/product/${product.id}`)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        navigate(`/product/${product.id}`);
+                    }
+                }}
+                className="bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
 
                 {/* Wishlist */}
                 <button
-                    onClick={toggleWishlist}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist();
+                    }}
                     className="absolute top-2 right-2 bg-white p-2 rounded-full shadow"
                 >
                     {wishlist ? "❤️" : "🤍"}
@@ -106,7 +122,8 @@ export default function ProductCard({ product }) {
                         </div>
 
                         <button
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 addToCart(product);
                                 setAdded(true);
                                 setTimeout(() => setAdded(false), 1000);
@@ -120,7 +137,10 @@ export default function ProductCard({ product }) {
 
                     {/* Quick View */}
                     <button
-                        onClick={() => setShowModal(true)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowModal(true);
+                        }}
                         className="text-xs text-blue-500 mt-2 hover:underline"
                     >
                         Quick View
