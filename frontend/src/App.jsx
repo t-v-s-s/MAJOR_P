@@ -15,6 +15,7 @@ import Categories from "./pages/Categories";
 import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Deals from "./pages/Deals";
 
 function App() {
   return (
@@ -25,12 +26,13 @@ function App() {
         <Route path="/categories" element={<Categories />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/deals" element={<Deals />} />
         <Route path="/checkout" element={
-            <ProtectedRoute>
-                <Checkout />
-            </ProtectedRoute>
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
         } />
-        
+
         <Route path="/login" element={<AuthRedirect> <Login /> </AuthRedirect>} />
         <Route path="/register" element={<AuthRedirect> <Register /> </AuthRedirect>} />
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Hero from "../components/Hero";
@@ -6,11 +7,19 @@ import ProductCard from "../components/ProductCard";
 import SkeletonCard from "../components/SkeletonCard";
 
 export default function Home() {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
+
+    const categories = [
+        { id: 1, name: "Electronics", img: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80" },
+        { id: 2, name: "Fashion", img: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=500&q=80" },
+        { id: 3, name: "Home & Garden", img: "https://plus.unsplash.com/premium_photo-1678836292808-b8dabf70f838?w=900&auto=format&fit=crop&q=60" },
+        { id: 4, name: "Sports", img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=500&q=80" },
+    ];
 
     // Fetch products (adjust API if needed)
     useEffect(() => {
-        fetch("http://localhost:3000/products")
+        fetch(`${import.meta.env.VITE_API_URL}/products`)
             .then((res) => res.json())
             .then((data) => setProducts(data))
             .catch(() => console.log("Error loading products"));
@@ -31,13 +40,20 @@ export default function Home() {
                     Shop by Category
                 </h2>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {["Electronics", "Fashion", "Home", "Sports"].map((cat, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    {categories.map((cat) => (
                         <div
-                            key={i}
-                            className="h-40 bg-white rounded-2xl flex items-center justify-center shadow-md hover:shadow-xl hover:scale-105 transition cursor-pointer"
+                            key={cat.id}
+                            onClick={() => navigate("/shop")}
+                            className="relative h-48 rounded-2xl overflow-hidden flex items-center justify-center shadow-md hover:shadow-xl hover:scale-105 transition cursor-pointer group"
                         >
-                            {cat}
+                            <img
+                                src={cat.img}
+                                alt={cat.name}
+                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                            />
+                            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition"></div>
+                            <h3 className="relative z-10 text-white text-xl font-bold tracking-wider">{cat.name}</h3>
                         </div>
                     ))}
                 </div>
@@ -82,7 +98,10 @@ export default function Home() {
             <section className="bg-accent text-white py-16 text-center">
                 <h2 className="text-3xl mb-4">Exclusive Deals</h2>
                 <p className="mb-6">Up to 50% off on selected items</p>
-                <button className="bg-white text-black px-6 py-2 rounded-full hover:scale-105 transition">
+                <button
+                    onClick={() => navigate("/deals")}
+                    className="bg-white text-black px-6 py-2 rounded-full hover:scale-105 transition"
+                >
                     Shop Deals
                 </button>
             </section>

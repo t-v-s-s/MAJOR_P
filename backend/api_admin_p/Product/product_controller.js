@@ -15,12 +15,20 @@ const pool = new Pool({
 export const addProduct = async (req, res) => {
     console.log("addProduct called")
     try {
-        const { product_name, price, description } = req.body;
+        const { product_name, price, description, category, discounts, information } = req.body;
         const image = req.file ? req.file.filename : null;
 
         const result = await pool.query(
-            "INSERT INTO products (product_name, price, description, image) VALUES ($1, $2, $3, $4) RETURNING *",
-            [product_name || null, price !== undefined ? price : null, description || null, image || null]
+            "INSERT INTO products (product_name, price, description, image, category, discounts, information) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+            [
+                product_name || null,
+                price !== undefined && price !== "" ? price : null,
+                description !== undefined && description !== "" ? description : null,
+                image || null,
+                category !== undefined && category !== "" ? category : null,
+                discounts !== undefined && discounts !== "" ? discounts : null,
+                information !== undefined && information !== "" ? information : null,
+            ]
         );
 
         res.json({
@@ -69,12 +77,21 @@ export const getProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { product_name, price, category } = req.body;
+        const { product_name, price, description, category, discounts, information } = req.body;
         const image = req.file ? req.file.filename : null;
 
         const result = await pool.query(
-            "UPDATE products SET product_name=COALESCE($1, product_name), price=COALESCE($2, price), category=COALESCE($3, category), image=COALESCE($4, image) WHERE id=$5 RETURNING *",
-            [product_name || null, price !== undefined ? price : null, category || null, image || null, id]
+            "UPDATE products SET product_name=COALESCE($1, product_name), price=COALESCE($2, price), description=COALESCE($3, description), category=COALESCE($4, category), discounts=COALESCE($5, discounts), information=COALESCE($6, information), image=COALESCE($7, image) WHERE id=$8 RETURNING *",
+            [
+                product_name || null,
+                price !== undefined && price !== "" ? price : null,
+                description !== undefined && description !== "" ? description : null,
+                category !== undefined && category !== "" ? category : null,
+                discounts !== undefined && discounts !== "" ? discounts : null,
+                information !== undefined && information !== "" ? information : null,
+                image || null,
+                id,
+            ]
         );
         res.json({
             message: "Product updated",

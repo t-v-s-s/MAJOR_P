@@ -29,11 +29,11 @@ export default function Profile() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] relative overflow-hidden">
 
-            {/* 🌸 Pink + 🌊 Blue ambient glow */}
+            {/*  Pink +  Blue ambient glow */}
             <div className="absolute w-[450px] h-[450px] bg-pink-300 opacity-30 blur-3xl rounded-full top-[-120px] right-[-120px]" />
             <div className="absolute w-[450px] h-[450px] bg-blue-300 opacity-30 blur-3xl rounded-full bottom-[-120px] left-[-120px]" />
 
-            {/* 🧊 Glass Card */}
+            {/*  Glass Card */}
             <motion.div
                 onMouseMove={handleMouseMove}
                 onMouseLeave={() => setRotate({ x: 0, y: 0 })}
@@ -47,7 +47,7 @@ export default function Profile() {
                     {/* ✨ Soft shine overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-40 rounded-3xl pointer-events-none" />
 
-                    {/* 👤 Avatar */}
+                    {/*  Avatar */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -60,12 +60,12 @@ export default function Profile() {
                         <span className="text-pink-400 text-lg mt-2">✿ ✦ ✿</span>
                     </motion.div>
 
-                    {/* 🏷 Title */}
+                    {/* Title */}
                     <h1 className="text-3xl text-center text-[#1f2a37] font-semibold tracking-wide mb-8">
 
                     </h1>
 
-                    {/* 📄 Info */}
+                    {/*  Info */}
                     <div className="space-y-5 text-[15px]">
                         <div className="flex justify-between border-b border-blue-100 pb-2">
                             <span className="text-gray-500">Name</span>
@@ -82,7 +82,7 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    {/* 🌸 Button */}
+                    {/*  Button */}
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.96 }}

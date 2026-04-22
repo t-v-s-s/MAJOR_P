@@ -1,21 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 export default function ProductCard({ product }) {
     const { addToCart } = useCart();
 
     const [added, setAdded] = useState(false);
-    const [wishlist, setWishlist] = useState(false);
+    const [wishlist, setWishlist] = useState(() => {
+        const saved = JSON.parse(localStorage.getItem("wishlist")) || [];
+        return saved.includes(product.id);
+    });
     const [showModal, setShowModal] = useState(false);
 
-    const rating = Math.floor(Math.random() * 2) + 4;
+    const [rating] = useState(() => Math.floor(Math.random() * 2) + 4);
 
-    // Load wishlist
-    useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem("wishlist")) || [];
-        setWishlist(saved.includes(product.id));
-    }, [product.id]);
+    const rawPrice = product?.price;
+    const priceNumber = typeof rawPrice === "number" ? rawPrice : Number(rawPrice);
+    const decimals =
+        typeof rawPrice === "string" && rawPrice.includes(".")
+            ? Math.min(rawPrice.split(".")[1].length, 2)
+            : 0;
+    const formatPrice = (value) => {
+        if (!Number.isFinite(value)) return rawPrice ?? "";
+        if (decimals > 0) return value.toFixed(decimals);
+        return String(Math.round(value));
+    };
+
+    const discountPercentRaw = product?.discounts ?? product?.discount ?? 0;
+    const discountPercent = Number(discountPercentRaw) || 0;
+    const hasDiscount = Number.isFinite(priceNumber) && discountPercent > 0;
+    const discountedPrice = hasDiscount
+        ? priceNumber - (priceNumber * discountPercent) / 100
+        : priceNumber;
 
     // Toggle wishlist
     const toggleWishlist = () => {
@@ -70,9 +86,24 @@ export default function ProductCard({ product }) {
 
                     {/* Price + Add */}
                     <div className="flex justify-between items-center mt-3">
-                        <span className="font-bold text-blue-600">
-                            ₹{product.price}
-                        </span>
+
+                        <div className="price">
+                            {hasDiscount ? (
+                                <>
+                                    <span className="text-lg font-semibold text-green-600">
+                                        ₹{formatPrice(discountedPrice)}
+                                    </span>
+
+                                    <span className="text-sm text-gray-500 line-through ml-2">
+                                        ₹{formatPrice(priceNumber)}
+                                    </span>
+                                </>
+                            ) : (
+                                <span className="text-lg font-semibold text-blue-600">
+                                    ₹{formatPrice(priceNumber)}
+                                </span>
+                            )}
+                        </div>
 
                         <button
                             onClick={() => {
@@ -100,7 +131,7 @@ export default function ProductCard({ product }) {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         className="bg-white p-5 rounded-2xl w-[90%] max-w-md"
@@ -114,7 +145,20 @@ export default function ProductCard({ product }) {
                         </p>
 
                         <p className="mt-3 font-bold text-blue-600">
-                            ₹{product.price}
+                            {hasDiscount ? (
+                                <>
+                                    <span className="text-lg font-semibold text-green-600">
+                                        ₹{formatPrice(discountedPrice)}
+                                    </span>
+                                    <span className="text-sm text-gray-500 line-through ml-2">
+                                        ₹{formatPrice(priceNumber)}
+                                    </span>
+                                </>
+                            ) : (
+                                <span className="text-lg font-semibold text-blue-600">
+                                    ₹{formatPrice(priceNumber)}
+                                </span>
+                            )}
                         </p>
 
                         <button
@@ -123,7 +167,7 @@ export default function ProductCard({ product }) {
                         >
                             Close
                         </button>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </>

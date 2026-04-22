@@ -18,7 +18,7 @@ export default function Header() {
     };
 
     return (
-        <nav className="bg-secondary px-10 py-4 flex justify-between items-center shadow-sm">
+        <nav className="sticky top-0 w-full bg-secondary px-10 py-4 flex justify-between items-center shadow-sm z-50">
 
             {/* Logo */}
             <h1

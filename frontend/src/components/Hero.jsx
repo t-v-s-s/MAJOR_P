@@ -2,26 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function Hero() {
-    const placeholderDataUri = (width, height, text) => {
-        const safeText = (text ?? "").toString().slice(0, 30);
-        const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-        <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#f3f4f6"/>
-            <stop offset="1" stop-color="#e5e7eb"/>
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#g)"/>
-        <rect x="${Math.round(width * 0.08)}" y="${Math.round(height * 0.08)}" width="${Math.round(width * 0.84)}" height="${Math.round(height * 0.84)}" rx="18" fill="#ffffff" opacity="0.55"/>
-        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" font-size="${Math.max(12, Math.round(Math.min(width, height) * 0.12))}" fill="#6b7280">
-          ${safeText}
-        </text>
-      </svg>
-    `.trim();
-        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-    };
-
     const MotionDiv = motion.div;
 
     return (
@@ -50,12 +30,12 @@ export default function Hero() {
             {/* RIGHT SIDE (Floating + Main Card Combined) */}
             <div className="relative mt-16 md:mt-0 w-[320px] h-[320px] flex items-center justify-center">
 
-                {/* Main Center Image (from second code) */}
-                <div className="absolute bg-white w-72 h-72 rounded-2xl flex items-center justify-center shadow-lg z-10">
+                {/* Main Center Image */}
+                <div className="absolute bg-white w-72 h-72 rounded-2xl flex items-center justify-center shadow-lg z-10 overflow-hidden p-2">
                     <img
-                        src={placeholderDataUri(220, 220, "Product")}
+                        src="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80"
                         alt="Featured product"
-                        className="rounded-xl object-cover"
+                        className="rounded-xl object-cover w-full h-full"
                     />
                 </div>
 
@@ -64,9 +44,9 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 60 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="absolute top-0 left-10 bg-white p-3 rounded-2xl shadow-xl w-32"
+                    className="absolute top-0 left-5 md:-left-10 bg-white p-3 rounded-2xl shadow-xl w-32 z-20"
                 >
-                    <img src={placeholderDataUri(120, 120, "Headphones")} alt="Headphones" className="rounded-lg" />
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" alt="Headphones" className="rounded-lg w-full h-24 object-cover" />
                     <p className="text-xs mt-1 text-textmain font-medium">Headphones</p>
                 </MotionDiv>
 
@@ -75,9 +55,9 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 60 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="absolute bottom-0 left-0 bg-white p-3 rounded-2xl shadow-xl w-36"
+                    className="absolute bottom-0 -left-6 md:-left-16 bg-white p-3 rounded-2xl shadow-xl w-36 z-20"
                 >
-                    <img src={placeholderDataUri(120, 120, "Shoes")} alt="Shoes" className="rounded-lg" />
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80" alt="Shoes" className="rounded-lg w-full h-28 object-cover" />
                     <p className="text-xs mt-1 text-textmain font-medium">Shoes</p>
                 </MotionDiv>
 
@@ -86,9 +66,9 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 60 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="absolute top-20 right-0 bg-white p-3 rounded-2xl shadow-xl w-32"
+                    className="absolute top-20 -right-6 md:-right-12 bg-white p-3 rounded-2xl shadow-xl w-32 z-20"
                 >
-                    <img src={placeholderDataUri(120, 120, "Watch")} alt="Watch" className="rounded-lg" />
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" alt="Watch" className="rounded-lg w-full h-24 object-cover" />
                     <p className="text-xs mt-1 text-textmain font-medium">Watch</p>
                 </MotionDiv>
 

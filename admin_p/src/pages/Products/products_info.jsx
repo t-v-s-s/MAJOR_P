@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import axios from "axios";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
@@ -12,7 +12,12 @@ export default function Product() {
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
+    const [discounts, setDiscounts] = useState("");
+    const [information, setInformation] = useState("");
     const [image, setImage] = useState(null);
+    const [existingImage, setExistingImage] = useState(null);
+    const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+    const [loadError, setLoadError] = useState("");
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const limit = 5;
@@ -31,6 +36,19 @@ export default function Product() {
     );
 
     const [editId, setEditId] = useState(null);
+
+    const resetForm = () => {
+        setProductName("");
+        setPrice("");
+        setDescription("");
+        setCategory("");
+        setDiscounts("");
+        setInformation("");
+        setImage(null);
+        setExistingImage(null);
+        setIsLoadingProduct(false);
+        setLoadError("");
+    };
 
     useEffect(() => {
         fetchProducts();
@@ -58,14 +76,57 @@ export default function Product() {
 
     const handleAddProduct = () => {
         setEditId(null);
-        setProductName("");
+        resetForm();
         setShowModal(true);
     };
 
-    const handleEdit = (product) => {
+    const fetchProductById = async (id) => {
+        const token = localStorage.getItem("token");
+        const config = token
+            ? { headers: { Authorization: `Bearer ${token}` } }
+            : undefined;
+
+        const res = await axios.get(
+            `http://localhost:3000/api/products/${id}`,
+            config
+        );
+
+        return res.data;
+    };
+
+    const handleEdit = async (product) => {
         setEditId(product.id);
-        setProductName(product.product_name);
         setShowModal(true);
+        setLoadError("");
+
+        // Prefill from current row for instant UI, then load latest from API.
+        setProductName(product.product_name || "");
+        setPrice(product.price || "");
+        setDescription(product.description || "");
+        setCategory(product.category || "");
+        setDiscounts(product.discounts ?? "");
+        setInformation(product.information ?? "");
+        setExistingImage(product.image || null);
+        setImage(null);
+
+        try {
+            setIsLoadingProduct(true);
+            const latest = await fetchProductById(product.id);
+            if (latest) {
+                setProductName(latest.product_name || "");
+                setPrice(latest.price || "");
+                setDescription(latest.description || "");
+                setCategory(latest.category || "");
+                setDiscounts(latest.discounts ?? "");
+                setInformation(latest.information ?? "");
+                setExistingImage(latest.image || null);
+            }
+        } catch (error) {
+            console.error("Error fetching product:", error);
+            setLoadError("Could not load latest product info.");
+        } finally {
+            setIsLoadingProduct(false);
+        }
     };
 
     // DELETE WITH TOKEN
@@ -105,8 +166,10 @@ export default function Product() {
             const formData = new FormData();
             formData.append("product_name", productName);
             formData.append("price", price);
-            formData.append("description", description);
+            if (description) formData.append("description", description);
             formData.append("category", category);
+            if (discounts !== "") formData.append("discounts", discounts);
+            if (information) formData.append("information", information);
             if (image) formData.append("image", image);
 
             const config = {
@@ -134,13 +197,9 @@ export default function Product() {
 
             // RESET + REFRESH
             setShowModal(false);
-            setProductName("");
+            resetForm();
 
             fetchProducts();
-            setPrice("");
-            setDescription("");
-            setCategory("");
-            setImage(null);
             setEditId(null);
 
 
@@ -156,7 +215,7 @@ export default function Product() {
     return (
         <>
             {showPopup && (
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{
@@ -170,7 +229,7 @@ export default function Product() {
                     }}
                 >
                     {editId ? "Product Updated" : "Product Added"}
-                </motion.div>
+                </Motion.div>
             )}
 
             {showModal && (
@@ -185,7 +244,7 @@ export default function Product() {
                     justifyContent: "center",
                     alignItems: "center"
                 }}>
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.8 }}
                         animate={{ scale: 1 }}
                         style={{
@@ -197,6 +256,16 @@ export default function Product() {
                         }}
                     >
                         <h3>{editId ? "Edit Product" : "Add Product"}</h3>
+                        {isLoadingProduct && (
+                            <p style={{ marginTop: "6px", fontSize: "12px", color: "#777" }}>
+                                Loading latest product info...
+                            </p>
+                        )}
+                        {loadError && (
+                            <p style={{ marginTop: "6px", fontSize: "12px", color: "#dc2626" }}>
+                                {loadError}
+                            </p>
+                        )}
 
                         <input
                             type="text"
@@ -262,6 +331,49 @@ export default function Product() {
                             <option value="Furniture">Furniture</option>
                         </select>
 
+                        {/* DISCOUNTS */}
+                        <input
+                            type="number"
+                            placeholder="Discount (optional)"
+                            value={discounts}
+                            onChange={(e) => setDiscounts(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginTop: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc"
+                            }}
+                        />
+
+                        {/* INFORMATION */}
+                        <input
+                            type="text"
+                            placeholder="Information (optional)"
+                            value={information}
+                            onChange={(e) => setInformation(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginTop: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc"
+                            }}
+                        />
+
+                        {editId && existingImage && (
+                            <div style={{ marginTop: "10px", textAlign: "left" }}>
+                                <div style={{ fontSize: "12px", color: "#777", marginBottom: "6px" }}>
+                                    Current image:
+                                </div>
+                                <img
+                                    src={`http://localhost:3000/uploads/${existingImage}`}
+                                    alt="Current product"
+                                    width="70"
+                                    style={{ borderRadius: "8px", border: "1px solid #eee" }}
+                                />
+                            </div>
+                        )}
 
                         {/* IMAGE */}
                         <input
@@ -276,6 +388,7 @@ export default function Product() {
                         <div style={{ marginTop: "15px" }}>
                             <button
                                 onClick={saveProduct}
+                                disabled={isLoadingProduct}
                                 style={{
                                     background: "#22c55e",
                                     color: "#fff",
@@ -289,7 +402,11 @@ export default function Product() {
                             </button>
 
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => {
+                                    setShowModal(false);
+                                    setEditId(null);
+                                    resetForm();
+                                }}
                                 style={{
                                     background: "#ef4444",
                                     color: "#fff",
@@ -301,12 +418,12 @@ export default function Product() {
                                 Cancel
                             </button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
 
 
-            <motion.div
+            <Motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
@@ -350,6 +467,8 @@ export default function Product() {
                             <th style={{ padding: "12px" }}>Product Name</th>
                             <th style={{ padding: "12px" }}>Price</th>
                             <th style={{ padding: "12px" }}>Description</th>
+                            <th style={{ padding: "12px" }}>Category</th>
+                            <th style={{ padding: "12px" }}>Discount</th>
                             <th style={{ padding: "12px" }}>Image</th>
                             <th style={{ padding: "12px" }}>Action</th>
                         </tr>
@@ -362,6 +481,8 @@ export default function Product() {
                                 <td style={{ padding: "12px" }}>{product.product_name}</td>
                                 <td style={{ padding: "12px" }}>{product.price}</td>
                                 <td style={{ padding: "12px" }}>{product.description}</td>
+                                <td style={{ padding: "12px" }}>{product.category || "-"}</td>
+                                <td style={{ padding: "12px" }}>{product.discounts ?? "-"}</td>
                                 <td style={{ padding: "12px" }}>
                                     {product.image && (
                                         <img
@@ -441,7 +562,7 @@ export default function Product() {
                     />
                 </div>
 
-            </motion.div>
+            </Motion.div>
         </>
     );
 }
