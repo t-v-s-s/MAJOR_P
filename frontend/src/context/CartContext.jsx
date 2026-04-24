@@ -69,6 +69,11 @@ export function CartProvider({ children }) {
         0
     );
 
+    // Clear cart (NEW)
+    const clearCart = () => {
+        setCart([]);
+    };
+
     return (
         <CartContext.Provider
             value={{
@@ -78,7 +83,8 @@ export function CartProvider({ children }) {
                 increaseQty,
                 decreaseQty,
                 totalPrice,
-                cartCount // ✅ added
+                cartCount,
+                clearCart // ✅ added
             }}
         >
             {children}

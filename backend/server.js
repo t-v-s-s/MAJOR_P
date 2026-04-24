@@ -5,6 +5,8 @@ import admin_authRoutes from "./routes_admin_p/authRoutes.js";
 import admin_productRoutes from "./routes_admin_p/productRoutes.js";
 import admin_masterRoutes from "./routes_admin_p/masterRoutes.js";
 import admin_userRoutes from "./routes_admin_p/userRoutes.js";
+import orderRoutes from "./routes_admin_p/orderRoutes.js";
+
 dotenv.config();
 const app = express();
 
@@ -16,6 +18,8 @@ app.use("/api", admin_authRoutes);
 app.use("/api/master", admin_masterRoutes);
 app.use("/api/products", admin_productRoutes);
 app.use("/api/user", admin_userRoutes);
+app.use("/api/orders", orderRoutes);
+
 app.get("/", (req, res) => res.send("API Running"));
 
 const PORT = process.env.PORT || 3000;

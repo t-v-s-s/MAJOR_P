@@ -5,6 +5,7 @@ import Country from "../pages/Masters/country";
 import State from "../pages/Masters/state";
 import User_info from "../pages/Users/user_info";
 import Products_info from "../pages/Products/products_info"
+import OrderInfo from "../pages/Orders/order_info";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -18,7 +19,8 @@ import {
     Map,
     Globe,
     User,
-    Package
+    Package,
+    ClipboardList
 } from "lucide-react";
 
 
@@ -230,6 +232,16 @@ export default function Dashboard() {
                         <span>Products</span>
                     </div>
 
+                    <div
+                        onClick={() => setActive("orders")}
+                        onMouseEnter={() => setHovered("orders")}
+                        onMouseLeave={() => setHovered("")}
+                        style={getSubMenuItemStyle("orders")}
+                    >
+                        <ClipboardList size={20} />
+                        <span>Orders</span>
+                    </div>
+
                 </div>
 
                 <button
@@ -313,6 +325,7 @@ export default function Dashboard() {
                 {active === "state" && <State />}
                 {active === "user" && <User_info />}
                 {active === "products" && <Products_info />}
+                {active === "orders" && <OrderInfo />}
             </div>
         </div>
     );

@@ -1,30 +1,8 @@
 import { useEffect, useState } from "react";
 
-const mockOrders = [
-    {
-        id: 1,
-        total: 1200,
-        status: "Delivered",
-        date: "12 Apr 2026",
-        step: 3,
-        items: [
-            { name: "Nike Shoes", img: "https://via.placeholder.com/60" },
-            { name: "Watch", img: "https://via.placeholder.com/60" },
-        ],
-    },
-    {
-        id: 2,
-        total: 800,
-        status: "Shipped",
-        date: "10 Apr 2026",
-        step: 2,
-        items: [
-            { name: "T-Shirt", img: "https://via.placeholder.com/60" },
-        ],
-    },
-];
+import axios from "axios";
 
-const steps = ["Placed", "Packed", "Shipped", "Delivered"];
+const steps = ["PLACED", "PACKED", "SHIPPED", "DELIVERED"];
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -33,12 +11,29 @@ export default function Orders() {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("All");
 
+    const token = localStorage.getItem("token");
+
     useEffect(() => {
-        setTimeout(() => {
-            setOrders(mockOrders);
-            setLoading(false);
-        }, 800);
-    }, []);
+        const fetchOrders = async () => {
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const res = await axios.get("http://localhost:3000/api/orders/my", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                setOrders(res.data || []);
+            } catch (err) {
+                console.error("Failed to fetch orders", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, [token]);
 
     const filtered = orders.filter((o) => {
         const matchSearch = o.id.toString().includes(search);
@@ -48,6 +43,18 @@ export default function Orders() {
 
     const downloadInvoice = (id) => {
         alert(`Downloading invoice for order #${id}`);
+    };
+
+    const formatDate = (iso) => {
+        if (!iso) return "";
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return String(iso);
+        return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    };
+
+    const getStepIndex = (status) => {
+        const idx = steps.indexOf(String(status || "").toUpperCase());
+        return idx === -1 ? 0 : idx;
     };
 
     return (
@@ -71,10 +78,10 @@ export default function Orders() {
                         className="px-3 py-2 border rounded-xl bg-white"
                     >
                         <option>All</option>
-                        <option>Placed</option>
-                        <option>Packed</option>
-                        <option>Shipped</option>
-                        <option>Delivered</option>
+                        <option>PLACED</option>
+                        <option>PACKED</option>
+                        <option>SHIPPED</option>
+                        <option>DELIVERED</option>
                     </select>
                 </div>
             </div>
@@ -101,7 +108,10 @@ export default function Orders() {
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500">Order #{order.id}</p>
-                                    <p className="font-semibold">{order.date}</p>
+                                    <p className="font-semibold">{formatDate(order.created_at)}</p>
+                                    {order.address_line && (
+                                        <p className="text-sm text-gray-600 mt-1">{order.address_line}</p>
+                                    )}
                                 </div>
 
                                 <span className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full">
@@ -109,23 +119,12 @@ export default function Orders() {
                                 </span>
                             </div>
 
-                            {/* items */}
-                            <div className="flex gap-2 mt-4">
-                                {order.items.map((item, i) => (
-                                    <img
-                                        key={i}
-                                        src={item.img}
-                                        className="w-12 h-12 rounded-lg border"
-                                    />
-                                ))}
-                            </div>
-
                             {/* timeline */}
                             <div className="flex mt-5 text-xs">
                                 {steps.map((s, i) => (
                                     <div key={i} className="flex-1 text-center">
                                         <div
-                                            className={`h-1 rounded ${i < order.step ? "bg-blue-500" : "bg-gray-200"
+                                            className={`h-1 rounded ${i <= getStepIndex(order.status) ? "bg-blue-500" : "bg-gray-200"
                                                 }`}
                                         />
                                         <p className="mt-1 text-gray-500">{s}</p>
@@ -135,7 +134,7 @@ export default function Orders() {
 
                             {/* actions */}
                             <div className="flex justify-between mt-5">
-                                <p className="font-bold">₹{order.total}</p>
+                                <p className="font-bold">₹{order.total_amount}</p>
 
                                 <button
                                     onClick={() => setSelectedOrder(order)}
@@ -162,6 +161,24 @@ export default function Orders() {
                         </div>
 
                         <p className="text-gray-500">{selectedOrder.status}</p>
+
+                        <div className="mt-5">
+                            <h3 className="font-semibold mb-2">Delivery Address</h3>
+                            <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700">
+                                <div className="font-medium text-gray-900">
+                                    {selectedOrder.full_name || "—"}
+                                </div>
+                                <div>{selectedOrder.address_line || "—"}</div>
+                                <div>
+                                    {[selectedOrder.area_name, selectedOrder.city_name, selectedOrder.state_name, selectedOrder.country_name]
+                                        .filter(Boolean)
+                                        .join(", ")}
+                                </div>
+                                <div>{selectedOrder.pincode}</div>
+                                {selectedOrder.phone && <div className="mt-2">Phone: {selectedOrder.phone}</div>}
+                                {selectedOrder.email && <div>Email: {selectedOrder.email}</div>}
+                            </div>
+                        </div>
 
                         {/* tracking */}
                         <div className="mt-5">
